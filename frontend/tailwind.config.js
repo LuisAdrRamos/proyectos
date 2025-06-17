@@ -2,10 +2,10 @@
 export default {
     content: [
         "./index.html",
-        "./src/**/*.{js,ts,jsx,tsx}"
+        "./src/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
-        extend: {},                    // Aquí puedes extender colores, fuentes, etc.
+        extend: {},
     },
-    plugins: [],                     // Plugins opcionales (como forms, typography, etc.)
+    plugins: [],
 }

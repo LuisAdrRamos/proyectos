@@ -2,7 +2,7 @@ import express, { json } from 'express';
 import path from 'path';
 import cors from 'cors';
 
-import personalRoutes from "./routes/personalRoutes.js";
+import personalRoutes from "./src/routes/personalRoutes.js";
 
 const app = express();
 const port = 3000;
