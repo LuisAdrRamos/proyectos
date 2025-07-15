@@ -90,10 +90,9 @@ default-character-set=utf8mb4
 ---
 
 ## 📷 Capturas del Frontend
-```
 Gestor de clientes:
-<img width="1845" height="585" alt="image" src="https://github.com/user-attachments/assets/dc0e16c4-2dde-4398-a5ed-354b82d994cb" />
-```
+<img width="1845" height="585" alt="image" src="https://github.com/user-attachments/assets/e63d8e90-d28b-49e1-9156-7c89f31d6f39" />
+
 
 ---
 
