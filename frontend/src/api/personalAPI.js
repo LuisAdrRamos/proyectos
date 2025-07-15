@@ -13,22 +13,21 @@ export const getClientes = async () => {
   }
 };
 
-
 export const agregarCliente = async (datos) => {
   const res = await fetch(`${BASE_URL}/agregar-cliente`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(datos),
   });
-  return await res.json();
-};
 
-export const eliminarCliente = async (id) => {
+  const data = await res.json();
 
-  const res = await fetch(`${BASE_URL}/eliminar-cliente/${id}`, {
-    method: "DELETE",
-  });
-  return await res.json();
+  if (!res.ok) {
+    const mensajes = data.errores?.map(e => e.msg).join('\n') || data.mensaje || 'Error inesperado';
+    throw new Error(mensajes);
+  }
+
+  return data;
 };
 
 export const actualizarCliente = async (id, datos) => {
@@ -36,6 +35,22 @@ export const actualizarCliente = async (id, datos) => {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(datos),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const mensajes = data.errores?.map(e => e.msg).join('\n') || data.mensaje || 'Error inesperado';
+    throw new Error(mensajes);
+  }
+
+  return data;
+};
+
+export const eliminarCliente = async (id) => {
+
+  const res = await fetch(`${BASE_URL}/eliminar-cliente/${id}`, {
+    method: "DELETE",
   });
   return await res.json();
 };

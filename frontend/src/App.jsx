@@ -5,7 +5,7 @@ import {
   agregarCliente,
   eliminarCliente,
   actualizarCliente
-} from './api/personalAPI'; // ⚠️ Si ya lo renombraste, cámbialo a clienteAPI
+} from './api/personalAPI';
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -52,18 +52,13 @@ export default function App() {
         const res = await agregarCliente(form);
         toast.success(res.mensaje);
       }
-      setForm({
-        identificacion: "",
-        nombres: "",
-        apellidos: "",
-        fecha_nacimiento: "",
-        genero: ""
-      });
+
+      setForm({ identificacion: "", nombres: "", apellidos: "", fecha_nacimiento: "", genero: "" });
       setModoEdicion(false);
       setIdEditar(null);
       cargarClientes();
-    } catch {
-      toast.error("Error al guardar datos");
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 

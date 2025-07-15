@@ -3,10 +3,6 @@ import db from "../model/personalModel.js"
 export const obtenerClientes = (req, res) => {
   db.query("SELECT * FROM cliente", (err, results) => {
     if (err) return res.status(500).json({ error: "Error al obtener datos" });
-
-    console.log("Clientes: ")
-    console.table(results)
-
     res.json(results)
   });
 };
