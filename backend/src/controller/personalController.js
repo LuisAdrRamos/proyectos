@@ -1,54 +1,56 @@
 import db from "../model/personalModel.js"
 
-export const obtenerPersonal = (req, res) => {
-  db.query("select * from personal", (err, results) => {
-    if (err) return res.status(500).json({ error: "Error al obtener datos" })
-    res.json(results);
+export const obtenerClientes = (req, res) => {
+  db.query("SELECT * FROM cliente", (err, results) => {
+    if (err) return res.status(500).json({ error: "Error al obtener datos" });
+
+    console.log("Clientes: ")
+    console.table(results)
+
+    res.json(results)
   });
 };
 
-export const agregarPersonal = (req, res) => {
-  const { nombre, cargo, salario } = req.body;
+export const agregarCliente = (req, res) => {
+  const { identificacion, nombres, apellidos, fecha_nacimiento, genero } = req.body;
   db.query(
-    "INSERT INTO personal (nombre, cargo, sueldo) VALUES (?, ?, ?)",
-    [nombre, cargo, salario],
+    "INSERT INTO cliente (identificacion, nombres, apellidos, fecha_nacimiento, genero) VALUES (?, ?, ?, ?, ?)",
+    [identificacion, nombres, apellidos, fecha_nacimiento, genero],
     (err, result) => {
-      if (err) return res.status(500).json({ error: "Error al insertar" });
+      if (err) return res.status(500).json({ error: "Error al insertar cliente" });
       res.status(201).json({
-        mensaje: "Empleado agregado con éxito",
-        id: result.insertId, nombre, cargo, salario,
+        mensaje: "Cliente agregado con éxito",
+        id: result.insertId
       });
     }
   );
 };
 
-export const actualizarPersonal = (req, res) => {
+export const actualizarCliente = (req, res) => {
   const { id } = req.params;
-  const { nombre, cargo, salario } = req.body;
+  const { identificacion, nombres, apellidos, fecha_nacimiento, genero } = req.body;
   db.query(
-    "UPDATE personal SET nombre = ?, cargo = ?, sueldo = ? WHERE id = ?",
-    [nombre, cargo, salario, id],
+    "UPDATE cliente SET identificacion = ?, nombres = ?, apellidos = ?, fecha_nacimiento = ?, genero = ? WHERE id = ?",
+    [identificacion, nombres, apellidos, fecha_nacimiento, genero, id],
     (err) => {
-      if (err) return res.status(500).json({ error: "Error al actualizar" });
-      res.json({
-        mensaje: "Empleado actualizado con éxito",
-        id, nombre, cargo, salario,
-      });
+      if (err) return res.status(500).json({ error: "Error al actualizar cliente" });
+      res.json({ mensaje: "Cliente actualizado con éxito" });
     }
   );
 };
 
-export const eliminarPersonal = (req, res) => {
+export const eliminarCliente = (req, res) => {
   const { id } = req.params;
-  db.query("DELETE FROM personal WHERE id = ?", [id], (err) => {
-    if (err) return res.status(500).json({ error: "Error al eliminar personal" });
-    res.json({ mensaje: "Empleado eliminado exitosamente" });
+  db.query("DELETE FROM cliente WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json({ error: "Error al eliminar cliente" });
+    res.json({ mensaje: "Cliente eliminado exitosamente" });
   });
 };
+
 
 export default {
-  obtenerPersonal,
-  agregarPersonal,
-  actualizarPersonal,
-  eliminarPersonal
+  obtenerClientes,
+  agregarCliente,
+  actualizarCliente,
+  eliminarCliente
 }

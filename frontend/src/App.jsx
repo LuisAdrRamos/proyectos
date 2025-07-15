@@ -1,41 +1,40 @@
 // App.jsx
 import { useEffect, useState } from 'react';
 import {
-  getEmpleados,
-  agregarEmpleado,
-  eliminarEmpleado,
-  actualizarEmpleado
-} from './api/personalAPI';
-
-import BuscadorNombre from './components/BuscarNombre';
-import Filtros from './components/Filtros';
+  getClientes,
+  agregarCliente,
+  eliminarCliente,
+  actualizarCliente
+} from './api/personalAPI'; // ⚠️ Si ya lo renombraste, cámbialo a clienteAPI
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserXmark, faPenToSquare, faL } from '@fortawesome/free-solid-svg-icons';
+import { faUserXmark, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 export default function App() {
-  const [empleados, setEmpleados] = useState([]);
-  const [form, setForm] = useState({ nombre: "", cargo: "", sueldo: "" });
+  const [clientes, setClientes] = useState([]);
+  const [form, setForm] = useState({
+    identificacion: "",
+    nombres: "",
+    apellidos: "",
+    fecha_nacimiento: "",
+    genero: ""
+  });
+
   const [modoEdicion, setModoEdicion] = useState(false);
   const [idEditar, setIdEditar] = useState(null);
 
-  // Busqueda de empleados
+  // Busqueda por nombre o apellido
   const [busqueda, setBusqueda] = useState("");
 
-  // Filtros
-  const [cargosSeleccionados, setCargosSeleccionados] = useState([]);
-  const [rangoSalario, setRangoSalario] = useState([0, 3000]);
-  const maxSalario = Math.max(...empleados.map(e => e.sueldo || 0));
-
-  const cargarEmpleados = async () => {
+  const cargarClientes = async () => {
     try {
-      const res = await getEmpleados();
-      setEmpleados(res);
+      const res = await getClientes();
+      setClientes(res);
     } catch (error) {
-      toast.error("Error al cargar los Empleados");
+      toast.error("Error al cargar los clientes");
     }
   };
 
@@ -47,100 +46,147 @@ export default function App() {
     e.preventDefault();
     try {
       if (modoEdicion) {
-        const res = await actualizarEmpleado(idEditar, form);
+        const res = await actualizarCliente(idEditar, form);
         toast.success(res.mensaje);
       } else {
-        const res = await agregarEmpleado(form);
+        const res = await agregarCliente(form);
         toast.success(res.mensaje);
       }
-      setForm({ nombre: "", cargo: "", sueldo: "" });
+      setForm({
+        identificacion: "",
+        nombres: "",
+        apellidos: "",
+        fecha_nacimiento: "",
+        genero: ""
+      });
       setModoEdicion(false);
       setIdEditar(null);
-      cargarEmpleados();
+      cargarClientes();
     } catch {
       toast.error("Error al guardar datos");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("¿Estas seguro de eliminar este empleado?")) return;
+    if (!window.confirm("¿Estás seguro de eliminar este cliente?")) return;
     try {
-      const res = await eliminarEmpleado(id);
+      const res = await eliminarCliente(id);
       toast.success(res.mensaje);
-      cargarEmpleados();
+      cargarClientes();
     } catch (error) {
-      toast.error("Error al eliminar empleado")
+      toast.error("Error al eliminar cliente");
     }
   };
 
-  const handleUpdate = (empleado) => {
+  const handleUpdate = (cliente) => {
     setForm({
-      nombre: empleado.nombre,
-      cargo: empleado.cargo,
-      sueldo: empleado.sueldo
+      identificacion: cliente.identificacion,
+      nombres: cliente.nombres,
+      apellidos: cliente.apellidos,
+      fecha_nacimiento: cliente.fecha_nacimiento?.slice(0, 10),
+      genero: cliente.genero
     });
 
     setModoEdicion(true);
-    setIdEditar(empleado.id);
+    setIdEditar(cliente.id);
   };
 
   const cancelarEdicion = () => {
     setModoEdicion(false);
     setIdEditar(null);
-    setForm({ nombre: "", cargo: "", sueld: "" });
+    setForm({
+      identificacion: "",
+      nombres: "",
+      apellidos: "",
+      fecha_nacimiento: "",
+      genero: ""
+    });
   };
 
   useEffect(() => {
-    cargarEmpleados();
+    cargarClientes();
   }, []);
 
-  const empleadosFiltrados = empleados.filter(e =>
-    e.nombre.toLowerCase().includes(busqueda) &&
-    e.sueldo >= rangoSalario[0] &&
-    e.sueldo <= rangoSalario[1] &&
-    (cargosSeleccionados.length === 0 || cargosSeleccionados.includes(e.cargo))
+  const clientesFiltrados = clientes.filter((c) =>
+    (c.nombres + " " + c.apellidos).toLowerCase().includes(busqueda.toLowerCase())
   );
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-      <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">Gestión de Personal</h1>
+      <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">Gestión de Clientes</h1>
       <ToastContainer position="top-right" autoClose={3000} theme="dark" />
 
       <div className="grid grid-cols-5 grid-rows-5 auto-rows-min gap-2">
-
-        {/* Columna izquierda: div1 + div3 + div4 agrupados */}
+        {/* Columna izquierda: formulario y búsqueda */}
         <div className="col-span-1 flex flex-col gap-2">
-          {/* div4 - Formulario */}
+          {/* Buscador */}
+          <div className="bg-gray-800 p-2 rounded">
+            <input
+              type="text"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscar por nombre/apellido"
+              className="w-full p-2 bg-gray-700 text-white rounded"
+            />
+          </div>
+
+          {/* Formulario */}
           <div className="bg-gray-800 p-4 rounded">
             <form onSubmit={handleSubmit}>
-              <h3>Agregar/Actualizar Personal</h3>
+              <h3>Agregar/Actualizar Cliente</h3>
+
               <input
                 type="text"
-                id="nombre"
-                value={form.nombre}
+                id="identificacion"
+                value={form.identificacion}
                 onChange={handleChange}
-                placeholder="Nombre"
+                placeholder="Identificación"
                 required
                 className="w-full p-2 mb-2 bg-gray-700 text-white rounded"
               />
+
               <input
                 type="text"
-                id="cargo"
-                value={form.cargo}
+                id="nombres"
+                value={form.nombres}
                 onChange={handleChange}
-                placeholder="Cargo"
+                placeholder="Nombres"
                 required
                 className="w-full p-2 mb-2 bg-gray-700 text-white rounded"
               />
+
               <input
-                type="number"
-                id="salario"
-                value={form.salario}
+                type="text"
+                id="apellidos"
+                value={form.apellidos}
                 onChange={handleChange}
-                placeholder="Salario"
+                placeholder="Apellidos"
+                required
+                className="w-full p-2 mb-2 bg-gray-700 text-white rounded"
+              />
+
+              <input
+                type="date"
+                id="fecha_nacimiento"
+                value={form.fecha_nacimiento}
+                onChange={handleChange}
+                required
+                className="w-full p-2 mb-2 bg-gray-700 text-white rounded"
+              />
+
+              <select
+                id="genero"
+                value={form.genero}
+                onChange={handleChange}
                 required
                 className="w-full p-2 mb-4 bg-gray-700 text-white rounded"
-              />
+              >
+                <option value="">Seleccione Género</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="binario">Prefiero no decirlo</option>
+              </select>
+
               <button
                 type="submit"
                 className="bg-blue-700 hover:bg-blue-600 text-white py-2 px-4 rounded w-full"
@@ -159,38 +205,23 @@ export default function App() {
               )}
             </form>
           </div>
-
-          {/* div1 - Buscador */}
-          <div className="bg-gray-800 p-2 rounded">
-            <BuscadorNombre busqueda={busqueda} setBusqueda={setBusqueda} />
-          </div>
-
-          {/* div3 - Filtros */}
-          <div className="bg-gray-800 p-4 rounded">
-            <Filtros
-              empleados={empleados}
-              cargosSeleccionados={cargosSeleccionados}
-              setCargosSeleccionados={setCargosSeleccionados}
-              rango={rangoSalario}
-              setRango={setRangoSalario}
-              maximo={maxSalario}
-            />
-          </div>
         </div>
 
-        {/* div2 - Lista de empleados */}
-        <div className="col-span-5 row-span- col-start-2 overflow-y-auto max-h-[auto] space-y-2">
-          {empleadosFiltrados.map((e) => (
-            <div key={e.id} className="bg-gray-800 p-4 rounded shadow flex justify-between items-center">
+        {/* Lista de clientes */}
+        <div className="col-span-4 col-start-2 overflow-y-auto max-h-[auto] space-y-2">
+          {clientesFiltrados.map((c) => (
+            <div key={c.id} className="bg-gray-800 p-4 rounded shadow flex justify-between items-center">
               <div>
-                <p className="text-blue-300 font-bold">{e.nombre}</p>
-                <p className="text-sm">{e.cargo} - ${e.sueldo}</p>
+                <p className="text-blue-300 font-bold">{c.nombres} {c.apellidos}</p>
+                <p className="text-sm">ID: {c.identificacion}</p>
+                <p className="text-sm">Nacimiento: {c.fecha_nacimiento?.slice(0, 10)}</p>
+                <p className="text-sm">Género: {c.genero}</p>
               </div>
               <div className="space-x-2">
-                <button onClick={() => handleUpdate(e)} className="text-green-600 hover:text-green-400">
+                <button onClick={() => handleUpdate(c)} className="text-green-600 hover:text-green-400">
                   <FontAwesomeIcon icon={faPenToSquare} />
                 </button>
-                <button onClick={() => handleDelete(e.id)} className="text-red-600 hover:text-red-400">
+                <button onClick={() => handleDelete(c.id)} className="text-red-600 hover:text-red-400">
                   <FontAwesomeIcon icon={faUserXmark} />
                 </button>
               </div>
@@ -200,5 +231,4 @@ export default function App() {
       </div>
     </div>
   );
-
 }
